@@ -20,6 +20,8 @@ char keys[ROWS][COLS] = {
   {'7','8','9'},
   {'*','0','#'}
 };
+//display uses pins A4 and A5
+//keypad uses digital pins as follows
 byte rowPins[ROWS] = {5, 6, 7, 8}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {2, 3, 4}; //connect to the column pinouts of the keypad
 
@@ -58,13 +60,38 @@ bool passwordInput = false;
 bool colon = true;
 bool firstTimeThrough = true;
 bool breakProgram = false;
-
-
+const int LED_PIN1 = 13;
+const int LED_PIN2 = 12;
+const int LED_PIN3 = 10;
+const int LED_PIN4 = A0;
 
 void setup(){
+  pinMode(LED_PIN1,OUTPUT);
+  pinMode(LED_PIN2,OUTPUT);
+  pinMode(LED_PIN3,OUTPUT);
+  pinMode(LED_PIN4,OUTPUT);
+
+  
   matrix.begin(0x70);
   Serial.begin(9600);
-  
+
+  digitalWrite(LED_PIN1,HIGH);
+  delay(20);
+  digitalWrite(LED_PIN2,HIGH);
+  delay(20);
+  digitalWrite(LED_PIN3,HIGH);
+  delay(20);
+  digitalWrite(LED_PIN4,HIGH);
+  delay(20);
+
+  digitalWrite(LED_PIN1,LOW);
+  delay(20);
+  digitalWrite(LED_PIN2,LOW);
+  delay(20);
+  digitalWrite(LED_PIN3,LOW);
+  delay(20);
+  digitalWrite(LED_PIN4,LOW);
+  delay(20);
   
   matrix.print(10000, DEC);
   matrix.writeDisplay();
@@ -198,18 +225,18 @@ keypad.getKey();
 //**********************Functions**********************************************************************************************
 void quietBuzz(){
 //  Serial.println("quiet Buzz");
-  analogWrite (11,2);
+  analogWrite (A1,128);
   delay (20);
-  analogWrite (11,0);
+  analogWrite (A1,0);
   return;
 }
 
 
 void loudBuzz(){
     Serial.println("Loud Buzz");
-  analogWrite (11,255);
+  analogWrite (A1,255);
   delay (20);
-  analogWrite (11,0);
+  analogWrite (A1,0);
   return;
 }
 
@@ -238,12 +265,22 @@ if(firstTimeThrough){
   firstTimeThrough=false;  
 char throwAwayKey = key;
 }  
-else if (key == '*' || key == '#')
-char throwAwayKey = key;
+else if (key == '*' || key == '#'){
+  Serial.println("Resetting check Keys");
+  keyForChecking1 = 10;
+  keyForChecking2 = 10;
+  keyForChecking3 = 10;
+  keyForChecking4 = 10;
+ digitalWrite (LED_PIN1,LOW);
+ digitalWrite (LED_PIN2,LOW);
+ digitalWrite (LED_PIN3,LOW);
+ digitalWrite (LED_PIN4,LOW);
+}
 //Serial.println("Keypad Event");
 else if (keyForChecking1==10){
 char keyForChecking1Char = key;
 keyForChecking1 = keyForChecking1Char - '0'; 
+digitalWrite (LED_PIN1,HIGH);
 Serial.print("Digit 1 is ");
 Serial.print(keyForChecking1Char);
 Serial.print("      ");
@@ -254,18 +291,21 @@ char  keyForChecking2Char = key;
 keyForChecking2 = keyForChecking2Char - '0'; 
 Serial.print("Digit 2 is ");
 Serial.println(keyForChecking2);
+digitalWrite (LED_PIN2,HIGH);
 }
 else if  (keyForChecking3==10){
 char  keyForChecking3Char = key;
   keyForChecking3 = keyForChecking3Char - '0'; 
 Serial.print("Digit 3 is ");
 Serial.println(keyForChecking3);
+digitalWrite (LED_PIN3,HIGH);
 }
 else if  (keyForChecking4==10){
 char  keyForChecking4Char = key;
   keyForChecking4 = keyForChecking4Char - '0'; 
   Serial.print("Digit 4 is ");
 Serial.println(keyForChecking4);
+digitalWrite (LED_PIN4,HIGH);
 }
 
 if (keyForChecking4!=10){
@@ -275,6 +315,10 @@ if (keyForChecking4!=10){
   keyForChecking2 = 10;
   keyForChecking3 = 10;
   keyForChecking4 = 10;
+ digitalWrite (LED_PIN1,LOW);
+ digitalWrite (LED_PIN2,LOW);
+ digitalWrite (LED_PIN3,LOW);
+ digitalWrite (LED_PIN4,LOW);
   }
 }              
 }
@@ -337,7 +381,7 @@ passwordInput = false;
 
 void fail(){
   while (1){Serial.println("Fail");
-  analogWrite(11,255);}
+  analogWrite(A1,255);}
 }
 
 
